@@ -8,6 +8,7 @@ set(EXECUTABLE opengl)
 
 # executables
 add_executable(${EXECUTABLE} src/Application.cpp)
+add_compile_definitions(PROJECT_DIR=${CMAKE_SOURCE_DIR})
 
 # add libraries
 add_subdirectory(libs/glew)

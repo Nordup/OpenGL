@@ -3,8 +3,12 @@
 
 #include <cstdio>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
-#ifdef GLEW_STATIC
+#define DTS(arg) #arg
+#define DEFINE_TO_SRT(arg) DTS(arg)
+
 static unsigned int CompileShader(unsigned int type, const std::string& source)
 {
     unsigned int id = glCreateShader(type);
@@ -47,6 +51,50 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
     return program;
 }
 
+struct ShaderProgramSource
+{
+    std::string VertexSource;
+    std::string FragmentSource;
+};
+
+static ShaderProgramSource ParseShader(const std::string& filepath)
+{
+    std::ifstream stream(filepath);
+    std::string line;
+
+    enum class ShaderType
+    {
+        NONE = -1, VERTEX = 0, FRAGMENT = 1
+    };
+
+    ShaderType type = ShaderType::NONE;
+    std::stringstream ss[2];
+    while (getline(stream, line))
+    {
+        if (line.find("#shader") != std::string::npos)
+        {
+            if (line.find("vertex") != std::string::npos)
+                type = ShaderType::VERTEX;
+            else if (line.find("fragment") != std::string::npos)
+                type = ShaderType::FRAGMENT;
+        }
+        else
+        {
+            if (type != ShaderType::NONE)
+                ss[(int)type] << line << "\n";
+        }
+    }
+
+    return { ss[0].str(), ss[1].str() };
+}
+
+#ifndef GLEW_STATIC
+int     main()
+{
+    std::cout << "GLEW_STATIC is not defined" << std::endl;
+    return 0;
+}
+#else
 int main(void)
 {
     GLFWwindow* window;
@@ -95,27 +143,10 @@ int main(void)
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 
     /* create shaders */
-    std::string vertexShader =
-        "#version 330 core\n"
-        "\n"
-        "layout(location = 0) in vec4 position;\n"
-        "\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = position;\n"
-        "}\n";
-    
-    std::string fragmentShader =
-        "#version 330 core\n"
-        "\n"
-        "layout(location = 0) out vec4 color;\n"
-        "\n"
-        "void main()\n"
-        "{\n"
-        "   color = vec4(1.0, 0.0, 0.0, 1.0);\n"
-        "}\n";
+    std::string project_dir = DEFINE_TO_SRT(PROJECT_DIR);
+    ShaderProgramSource shaderPSource = ParseShader(project_dir + "/resources/shaders/basic.shader");
 
-    unsigned int shader = CreateShader(vertexShader, fragmentShader);
+    unsigned int shader = CreateShader(shaderPSource.VertexSource, shaderPSource.FragmentSource);
     glUseProgram(shader);
 
     /* Loop until the user closes the window */
@@ -137,12 +168,6 @@ int main(void)
     glDeleteProgram(shader);
 
     glfwTerminate();
-    return 0;
-}
-#else
-int     main()
-{
-    std::cout << "GLEW_STATIC is not defined" << std::endl;
     return 0;
 }
 #endif
