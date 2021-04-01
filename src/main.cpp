@@ -6,34 +6,13 @@
 #include <fstream>
 #include <sstream>
 
-#define DTS(arg) #arg
-#define DEFINE_TO_SRT(arg) DTS(arg)
+#include "Renderer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
-
-#define GLCall(x)   GLClearError(); \
-                    x; \
-                    if (!GLCheckError(#x, __FILE__, __LINE__))
-
-static void GLClearError()
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    while (glGetError() != GL_NO_ERROR);
-}
-
-static bool GLCheckError(const char* function, const char* file, int line)
-{
-    bool first_error = true;
-    while (GLenum error = glGetError())
-    {
-        if (first_error)
-        {
-            first_error = false;
-            std::cout << "Error in " << file << " func " << function << " line: " << line << std::endl;
-        }
-        std::cout << "\t [OpenGL error] (0x" << std::hex << error << ")" << std::endl;
-    }
-    if (!first_error)
-        return false;
-    return true;
+    glViewport(0, 0, width, height);
 }
 
 static unsigned int CompileShader(unsigned int type, const std::string& source)
@@ -129,9 +108,14 @@ int main(void)
     /* Initialize the library */
     if (!glfwInit())
         return -1;
+    
+    /* configure glew */
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1920, 1080, "OpenGL", NULL, NULL);
+    window = glfwCreateWindow(600, 600, "OpenGL", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -140,6 +124,7 @@ int main(void)
     
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
 
     /* initialize GLEW */
     GLenum err = glewInit();
@@ -150,8 +135,16 @@ int main(void)
 	}
 	fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
     
+    /* resize opengl viewport on every window size changing */
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
     /* print OpenGL version*/
     std::cout << "OpenGL vesion: " << glGetString(GL_VERSION) << std::endl;
+
+    /* vertex array object */
+    unsigned int vao;
+    GLCall(glGenVertexArrays(1, &vao));
+    GLCall(glBindVertexArray(vao));
 
     /* Create OpenGL buffer*/
     float positions[] = {
@@ -160,11 +153,7 @@ int main(void)
          0.5f,  0.5f,
          -0.5f, 0.5f,
     }; // our verticies
-
-    unsigned int buffer;
-    GLCall(glGenBuffers(1, &buffer));
-    GLCall(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-    GLCall(glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), positions, GL_STATIC_DRAW));
+    VertexBuffer vb(positions, 4 * 2 *sizeof(float));
 
     /* create vertex attribute */
     GLCall(glEnableVertexAttribArray(0));
@@ -175,10 +164,7 @@ int main(void)
         0, 1, 2,
         2, 3, 0
     };
-    unsigned int ibo;
-    GLCall(glGenBuffers(1, &ibo));
-    GLCall(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
-    GLCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indicies, GL_STATIC_DRAW));
+    IndexBuffer ib(indicies, 6);
 
     /* create shaders */
     std::string project_dir = DEFINE_TO_SRT(PROJECT_DIR);
@@ -187,14 +173,43 @@ int main(void)
     unsigned int shader = CreateShader(shaderPSource.VertexSource, shaderPSource.FragmentSource);
     GLCall(glUseProgram(shader));
 
+    /* uniforms */
+    GLCall(int location = glGetUniformLocation(shader, "u_Color"));
+    if (location == -1)
+        std::cout << "error: cannot find 'u_Collor'" << std::endl;
+    GLCall(glUniform4f(location, 0.9, 0.3, 0.5, 0.7));
+
+    /* unbind all */
+    GLCall(glBindVertexArray(0));
+    vb.Unbind();
+    ib.Unbind();
+    GLCall(glUseProgram(0));
+
+
+    float r = 0.0f;
+    float increment = 0.01f;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
+        /* Bind what we need */
+        GLCall(glUseProgram(shader));
+        GLCall(glUniform4f(location, r, 0.3, 0.5, 0.7));
+        GLCall(glBindVertexArray(vao));
+        ib.Bind();
+
+
         /* Draw our result */
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+
+        /* change color */
+        if (r > 1.0f)
+            increment = -0.01f;
+        else if (r < 0.0f)
+            increment = 0.01f;
+        r += increment;
 
         /* Swap front and back buffers */
         GLCall(glfwSwapBuffers(window));

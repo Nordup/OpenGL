@@ -5,10 +5,14 @@ set(CMAKE_CXX_STANDARD 17)
 
 # executable name
 set(EXECUTABLE opengl)
+set(SOURCES src/main.cpp src/Renderer.cpp src/VertexBuffer.cpp src/IndexBuffer.cpp)
 
 # executables
-add_executable(${EXECUTABLE} src/Application.cpp)
+add_executable(${EXECUTABLE} ${SOURCES})
 add_compile_definitions(PROJECT_DIR=${CMAKE_SOURCE_DIR})
+
+# headers
+include_directories(include/)
 
 # add libraries
 add_subdirectory(libs/glew)
