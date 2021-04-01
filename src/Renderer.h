@@ -1,3 +1,6 @@
+#ifndef RENDERER_H
+#define RENDERER_H
+
 #include <GL/glew.h>
 #include <cstdlib>
 
@@ -13,3 +16,5 @@ void GLClearError();
 
 
 bool GLCheckError(const char* function, const char* file, int line);
+
+#endif

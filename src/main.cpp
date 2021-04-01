@@ -9,6 +9,8 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -142,9 +144,7 @@ int main(void)
     std::cout << "OpenGL vesion: " << glGetString(GL_VERSION) << std::endl;
 
     /* vertex array object */
-    unsigned int vao;
-    GLCall(glGenVertexArrays(1, &vao));
-    GLCall(glBindVertexArray(vao));
+    VertexArray va;
 
     /* Create OpenGL buffer*/
     float positions[] = {
@@ -155,9 +155,10 @@ int main(void)
     }; // our verticies
     VertexBuffer vb(positions, 4 * 2 *sizeof(float));
 
-    /* create vertex attribute */
-    GLCall(glEnableVertexAttribArray(0));
-    GLCall(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
+    /* create layout */
+    VertexBufferLayout layout;
+    layout.Push<float>(2);
+    va.AddBuffer(vb, layout);
 
     /* create index buffer */
     unsigned int indicies[] = {
@@ -180,7 +181,7 @@ int main(void)
     GLCall(glUniform4f(location, 0.9, 0.3, 0.5, 0.7));
 
     /* unbind all */
-    GLCall(glBindVertexArray(0));
+    va.Unbind();
     vb.Unbind();
     ib.Unbind();
     GLCall(glUseProgram(0));
@@ -197,9 +198,9 @@ int main(void)
         /* Bind what we need */
         GLCall(glUseProgram(shader));
         GLCall(glUniform4f(location, r, 0.3, 0.5, 0.7));
-        GLCall(glBindVertexArray(vao));
-        ib.Bind();
 
+        va.Bind();
+        ib.Bind();
 
         /* Draw our result */
         GLCall(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));

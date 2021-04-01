@@ -1,3 +1,5 @@
+#ifndef INDEX_BUFFER_H
+#define INDEX_BUFFER_H
 
 class IndexBuffer
 {
@@ -13,3 +15,5 @@ public:
 
     inline unsigned int GetCount() const { return m_Count; }
 };
+
+#endif
