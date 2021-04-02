@@ -40,7 +40,7 @@ int main(void)
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
          0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
          0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-         -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f,
+         -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.5f,
     }; // our verticies
     VertexBuffer vb(positions, 4 * 6 *sizeof(float));
 

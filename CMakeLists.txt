@@ -18,5 +18,8 @@ add_compile_definitions(PROJECT_DIR=${CMAKE_SOURCE_DIR})
 # add libraries
 add_subdirectory(libs/glew)
 add_subdirectory(libs/GLFW)
+# vendor
+add_subdirectory(src/vendor)
+
 # preprocessor definition for GLEW
 add_compile_definitions(GLEW_STATIC)
