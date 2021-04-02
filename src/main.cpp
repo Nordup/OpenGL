@@ -6,6 +6,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Texture.h"
 
 int InitializeLibs(GLFWwindow*& window);
 
@@ -36,16 +37,17 @@ int main(void)
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float positions[] = {
-        // positions    // colors
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-         0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-         -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.5f,
+        // positions        // texCoord // colors
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+         0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+         -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
     }; // our verticies
-    VertexBuffer vb(positions, 4 * 6 *sizeof(float));
+    VertexBuffer vb(positions, 4 * 8 *sizeof(float));
 
     VertexBufferLayout layout;
     layout.Push<float>(3);
+    layout.Push<float>(2);
     layout.Push<float>(3);
 
     VertexArray va;
@@ -57,10 +59,14 @@ int main(void)
     };
     IndexBuffer ib(indicies, 6);
 
-    std::string project_dir = DEFINE_TO_SRT(PROJECT_DIR);
-    Shader shader(project_dir + "/res/shaders/basic.shader");
+    Shader shader((std::string)DEFINE_TO_SRT(PROJECT_DIR) + "/res/shaders/basic.shader");
     shader.Bind();
     shader.SetUnifrom4f("u_Color", 1, 1, 1, 1);
+
+    Texture texture((std::string)DEFINE_TO_SRT(PROJECT_DIR) + "/res/textures/cherno.png");
+    int slot = 0;
+    texture.Bind(slot);
+    shader.SetUnifrom1i("u_Texture", slot);
 
     Renderer renderer;
 
@@ -96,7 +102,7 @@ int main(void)
         /* change color */
         if (r > 1.0f)
             increment = -0.02f;
-        else if (r < 0.0f)
+        else if (r < 0.3f)
             increment = 0.02f;
         r += increment;
 

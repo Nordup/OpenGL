@@ -23,6 +23,13 @@ bool GLCheckError(const char* function, const char* file, int line)
     return true;
 }
 
+
+Renderer::Renderer()
+{
+    GLCall(glEnable(GL_BLEND));
+    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+}
+
 void Renderer::Clear() const
 {
     GLCall(glClear(GL_COLOR_BUFFER_BIT));

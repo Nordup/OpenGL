@@ -7,6 +7,7 @@
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "Texture.h"
 
 class Shader;
 
@@ -26,6 +27,7 @@ bool GLCheckError(const char* function, const char* file, int line);
 class Renderer
 {
 public:
+    Renderer();
     void Clear() const;
     void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
 };

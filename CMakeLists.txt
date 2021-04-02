@@ -6,7 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 # executable name
 set(EXECUTABLE opengl)
 set(SOURCES src/main.cpp src/Renderer.cpp src/VertexBuffer.cpp
-            src/IndexBuffer.cpp src/VertexArray.cpp src/Shader.cpp src/InitializeLibs.cpp)
+            src/IndexBuffer.cpp src/VertexArray.cpp src/Shader.cpp
+            src/InitializeLibs.cpp src/Texture.cpp)
 
 # executables
 add_executable(${EXECUTABLE} ${SOURCES})
