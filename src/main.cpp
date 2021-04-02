@@ -18,12 +18,15 @@ void ProcessInput(GLFWwindow* window)
 #ifdef GLEW_STATIC
 int main(void)
 {
-    /* create window, load OpenGL */
+    // create window, load OpenGL
+    // ---------------------------------
     GLFWwindow* window;
     if (InitializeLibs(window) != 0)
         return -1;
 
 
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
     float positions[] = {
         -0.5f, -0.5f,
          0.5f, -0.5f,
@@ -45,30 +48,36 @@ int main(void)
     IndexBuffer ib(indicies, 6);
 
     std::string project_dir = DEFINE_TO_SRT(PROJECT_DIR);
-    Shader shader(project_dir + "/resources/shaders/basic.shader");
+    Shader shader(project_dir + "/res/shaders/basic.shader");
     shader.Bind();
     shader.SetUnifrom4f("u_Color", 0.9, 0.3, 0.5, 0.7);
 
     Renderer renderer;
 
 
-    /* unbind all */
+    // unbind all
+    /// --------------
     va.Unbind();
     vb.Unbind();
     ib.Unbind();
     shader.Unbind();
 
+
+    // render loop
+    // --------------------------------------------------
     float r = 0.0f;
     float increment = 0.05f;
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         // input
+        //-----------------------
         ProcessInput(window);
         // clear window
         renderer.Clear();
 
-        /* Bind what we need */
+        // Bind what we need
+        // ----------------------
         shader.Bind();
         shader.SetUnifrom4f("u_Color", r, 0.3, 0.5, 0.7);
 
@@ -81,12 +90,15 @@ int main(void)
             increment = 0.05f;
         r += increment;
 
-        // check and call events and swap the buffers
+        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+        // -------------------------------------------------------------------------------
         GLCall(glfwSwapBuffers(window));
         GLCall(glfwPollEvents());
     }
 
 
+    // glfw: terminate, clearing all previously allocated GLFW resources.
+    // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
 }
