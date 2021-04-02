@@ -24,6 +24,11 @@ void GLClearError();
 
 bool GLCheckError(const char* function, const char* file, int line);
 
+inline std::string getProjDir()
+{
+    return (std::string)DEFINE_TO_SRT(PROJECT_DIR);
+}
+
 class Renderer
 {
 public:

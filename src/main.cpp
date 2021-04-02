@@ -59,14 +59,17 @@ int main(void)
     };
     IndexBuffer ib(indicies, 6);
 
-    Shader shader((std::string)DEFINE_TO_SRT(PROJECT_DIR) + "/res/shaders/basic.shader");
+    Shader shader(getProjDir() + "/res/shaders/basic.shader");
     shader.Bind();
     shader.SetUnifrom4f("u_Color", 1, 1, 1, 1);
 
-    Texture texture((std::string)DEFINE_TO_SRT(PROJECT_DIR) + "/res/textures/cherno.png");
-    int slot = 0;
-    texture.Bind(slot);
-    shader.SetUnifrom1i("u_Texture", slot);
+    int slot = 1;
+    Texture texture1(getProjDir() + "/res/textures/cherno.png", slot);
+    shader.SetUnifrom1i("u_Texture1", slot);
+
+    slot = 2;
+    Texture texture2(getProjDir() + "/res/textures/wall.jpg", slot);
+    shader.SetUnifrom1i("u_Texture2", slot);
 
     Renderer renderer;
 

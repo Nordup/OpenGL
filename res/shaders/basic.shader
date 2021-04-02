@@ -21,7 +21,9 @@ void main()
 
 layout(location = 0) out vec4 color;
 
-uniform sampler2D u_Texture;
+
+uniform sampler2D u_Texture1;
+uniform sampler2D u_Texture2;
 uniform vec4 u_Color;
 
 in vec2 v_TexCoord;
@@ -29,6 +31,7 @@ in vec4 v_Colors;
 
 void main()
 {
-   vec4 texColor = texture(u_Texture, v_TexCoord);
-   color = texColor * u_Color * v_Colors;
+   vec4 texColor1 = texture(u_Texture1, v_TexCoord);
+   vec4 texColor2 = texture(u_Texture2, v_TexCoord);
+   color = mix(mix(texColor1, texColor2, 0.8), v_Colors, 0.5) * u_Color;
 };

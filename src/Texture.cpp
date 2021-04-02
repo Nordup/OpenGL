@@ -2,14 +2,14 @@
 #include "Texture.h"
 #include "Renderer.h"
 
-Texture::Texture(const std::string& filepath)
+Texture::Texture(const std::string& filepath, unsigned int slot /*= 0*/)
     : m_RendererID(0), m_FilePath(filepath), m_LocalBuffer(nullptr), m_Width(0), m_Height(0), m_BPP(0)
 {
     stbi_set_flip_vertically_on_load(1);
     m_LocalBuffer = stbi_load(filepath.c_str(), &m_Width, &m_Height, &m_BPP, 4);
 
     GLCall(glGenTextures(1, &m_RendererID));
-    GLCall(glBindTexture(GL_TEXTURE_2D, m_RendererID));
+    Bind(slot);
 
     // set the texture wrapping parameters
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));	// set texture wrapping to GL_REPEAT (default wrapping method)
@@ -30,8 +30,6 @@ Texture::Texture(const std::string& filepath)
     {
         std::cout << "Failed to load texture '" << filepath << "'" << std::endl;
     }
-
-    Unbind();
 }
 
 Texture::~Texture()
