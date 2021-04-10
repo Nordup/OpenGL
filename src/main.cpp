@@ -1,6 +1,10 @@
 #include <GL/glew.h> // load opengl functions from gpu drivers on runtime crossplatform
 #include <GLFW/glfw3.h> // create crossplatform window
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
@@ -63,12 +67,19 @@ int main(void)
     shader.Bind();
     shader.SetUnifrom4f("u_Color", 1, 1, 1, 1);
 
+    // transform
+    glm::mat4 trans(1.0f);
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0));
+    trans = glm::translate(trans, glm::vec3(0.5, 0.5, 0));
+    shader.SetUniformMatrix4fv("trans", trans);
+
+    // textures
     int slot = 1;
-    Texture texture1(getProjDir() + "/res/textures/cherno.png", slot);
+    Texture texture1(getProjDir() + "/res/textures/awesomeface.png", slot);
     shader.SetUnifrom1i("u_Texture1", slot);
 
     slot = 2;
-    Texture texture2(getProjDir() + "/res/textures/wall.jpg", slot);
+    Texture texture2(getProjDir() + "/res/textures/container.jpg", slot);
     shader.SetUnifrom1i("u_Texture2", slot);
 
     Renderer renderer;
@@ -99,6 +110,14 @@ int main(void)
         // ----------------------
         shader.Bind();
         shader.SetUnifrom4f("u_Color", r, r, r, r);
+
+        // translate
+        // ----------------------
+        trans = glm::rotate(glm::mat4(1), (float)glfwGetTime() / 2, glm::vec3(0, 0, 1));
+        trans = glm::translate(trans, glm::vec3(0.5, -0.5, 0));
+        trans = glm::rotate(trans, (float)glfwGetTime() * 2, glm::vec3(0, 0, 1));
+        trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+        shader.SetUniformMatrix4fv("trans", trans);
 
         renderer.Draw(va, ib, shader);
 

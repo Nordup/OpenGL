@@ -7,6 +7,9 @@
 #include <sstream>
 #include <unordered_map>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Renderer.h"
 
 struct ShaderProgramSource
@@ -32,6 +35,7 @@ public:
     void SetUnifrom1i(const std::string& name, int value);
     void SetUnifrom1f(const std::string& name, float value);
     void SetUnifrom4f(const std::string& name, float v0, float v1, float f2, float f3);
+    void SetUniformMatrix4fv(const std::string& name, glm::mat4 value);
 private:
     int GetUniformLocation(const std::string& name);
     unsigned int CompileShader(unsigned int type, const std::string& source);

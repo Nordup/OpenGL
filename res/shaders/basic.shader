@@ -8,9 +8,11 @@ layout(location = 2) in vec3 Colors;
 out vec2 v_TexCoord;
 out vec4 v_Colors;
 
+uniform mat4 trans;
+
 void main()
 {
-   gl_Position = vec4(position.x, position.y, 0, 1);
+   gl_Position = trans * vec4(position.x, position.y, 0, 1);
    v_TexCoord = TexCoord;
    v_Colors = vec4(Colors, 1.0);
 };
@@ -33,5 +35,5 @@ void main()
 {
    vec4 texColor1 = texture(u_Texture1, v_TexCoord);
    vec4 texColor2 = texture(u_Texture2, v_TexCoord);
-   color = mix(mix(texColor1, texColor2, 0.8), v_Colors, 0.5) * u_Color;
+   color = mix(mix(texColor1, texColor2, u_Color.x), v_Colors, 1 - u_Color.x);
 };
