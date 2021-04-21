@@ -1,10 +1,11 @@
 # vscode
 .vscode
 .vs
+.idea
 
 # build folders
-*build/
-*/*build/
+*build*/
+*/*build*/
 
 # cmake
 CMakeLists.txt.user
